@@ -116,10 +116,20 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
         ? contentWindow()
         : contentWindow;
 
+      var supportsPassive = false;
+      try {
+        var opts = Object.defineProperty({}, 'passive', {
+          get: function() {
+            supportsPassive = true;
+          }
+        });
+        window.addEventListener("test", null, opts);
+      } catch (e) {}
+
       for (const key in this.events) {
         if (this.events.hasOwnProperty(key)) {
           events[key].forEach(eventName =>
-            this.container.addEventListener(eventName, this.events[key], false)
+            this.container.addEventListener(eventName, this.events[key], supportsPassive ? { passive: true } : false)
           );
         }
       }
